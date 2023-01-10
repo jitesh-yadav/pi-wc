@@ -1,11 +1,11 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, OnInit } from '@angular/core';
 
 @Component({
   selector: 'app-save-pi',
   templateUrl: './save-pi.component.html',
   styleUrls: ['./save-pi.component.scss']
 })
-export class SavePiComponent implements OnInit, AfterViewInit {
+export class SavePiComponent implements OnInit, AfterViewInit, OnDestroy {
   canvas: any;
   // -----------------------------
   // 	SFX & Music
@@ -48,10 +48,6 @@ export class SavePiComponent implements OnInit, AfterViewInit {
   ctx: any;
 
   ngOnInit(): void {
-    this.audio.volume = 0.1;
-    this.audio.loop = true;
-    this.audio.oncanplaythrough = <any>this.audio.play();
-
     // -----------------------------
     // 	Detector
     // -----------------------------
@@ -73,6 +69,7 @@ export class SavePiComponent implements OnInit, AfterViewInit {
     this.ctx = this.canvas.getContext('2d');
 
     this.canvas.width = this.canvas.height = 400;
+    this.resetScene();
 
     // -----------------------------
     // 	Events
@@ -97,6 +94,10 @@ export class SavePiComponent implements OnInit, AfterViewInit {
     document.getElementById('mute')?.addEventListener('change', function (e: any) {
       self.audio.muted = !self.audio.muted;
     });
+  }
+
+  ngOnDestroy(): void {
+    this.resetScene();
   }
 
   degreesToRad = (ang: number) => ang * (Math.PI / 180);
@@ -210,6 +211,9 @@ export class SavePiComponent implements OnInit, AfterViewInit {
   // -----------------------------
 
   play(duration: number) {
+    this.audio.volume = 0.1;
+    this.audio.loop = true;
+    this.audio.oncanplaythrough = <any>this.audio.play();
     let start = performance.now();
     let secs = '-0';
     let i = 1;
@@ -248,9 +252,9 @@ export class SavePiComponent implements OnInit, AfterViewInit {
     this.detector.s = this.degreesToRad(90 - 30 / 2);
     this.detector.e = this.degreesToRad(90 - 30 / 2);
     this.draw();
+    this.audio.pause();
+    this.audio.currentTime = 0;
   }
-  // init
-  // resetScene();
 
   // -----------------------------
   // 	Game over
